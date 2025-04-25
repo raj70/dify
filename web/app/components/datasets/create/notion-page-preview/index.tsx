@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import Loading from '@/app/components/base/loading'
 import s from './index.module.css'
 import cn from '@/utils/classnames'
 import type { NotionPage } from '@/models/common'
@@ -48,13 +49,13 @@ const NotionPagePreview = ({
       <div className={cn(s.previewHeader)}>
         <div className={cn(s.title, 'title-md-semi-bold')}>
           <span>{t('datasetCreation.stepOne.pagePreview')}</span>
-          <div className='flex items-center justify-center w-6 h-6 cursor-pointer' onClick={hidePreview}>
+          <div className='flex h-6 w-6 cursor-pointer items-center justify-center' onClick={hidePreview}>
             <XMarkIcon className='h-4 w-4'></XMarkIcon>
           </div>
         </div>
         <div className={cn(s.fileName, 'system-xs-medium')}>
           <NotionIcon
-            className='shrink-0 mr-1'
+            className='mr-1 shrink-0'
             type='page'
             src={currentPage?.page_icon}
           />
@@ -62,7 +63,7 @@ const NotionPagePreview = ({
         </div>
       </div>
       <div className={cn(s.previewContent, 'body-md-regular')}>
-        {loading && <div className={cn(s.loading)} />}
+        {loading && <Loading type='area' />}
         {!loading && (
           <div className={cn(s.fileContent, 'body-md-regular')}>{previewContent}</div>
         )}
