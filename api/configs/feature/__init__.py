@@ -74,7 +74,7 @@ class CodeExecutionSandboxConfig(BaseSettings):
 
     CODE_EXECUTION_ENDPOINT: HttpUrl = Field(
         description="URL endpoint for the code execution service",
-        default="http://sandbox:8194",
+        default=HttpUrl("http://sandbox:8194"),
     )
 
     CODE_EXECUTION_API_KEY: str = Field(
@@ -145,7 +145,7 @@ class PluginConfig(BaseSettings):
 
     PLUGIN_DAEMON_URL: HttpUrl = Field(
         description="Plugin API URL",
-        default="http://localhost:5002",
+        default=HttpUrl("http://localhost:5002"),
     )
 
     PLUGIN_DAEMON_KEY: str = Field(
@@ -188,7 +188,7 @@ class MarketplaceConfig(BaseSettings):
 
     MARKETPLACE_API_URL: HttpUrl = Field(
         description="Marketplace API URL",
-        default="https://marketplace.dify.ai",
+        default=HttpUrl("https://marketplace.dify.ai"),
     )
 
 
@@ -234,6 +234,13 @@ class FileAccessConfig(BaseSettings):
         "Url is signed and has expiration time.",
         validation_alias=AliasChoices("FILES_URL", "CONSOLE_API_URL"),
         alias_priority=1,
+        default="",
+    )
+
+    INTERNAL_FILES_URL: str = Field(
+        description="Internal base URL for file access within Docker network,"
+        " used for plugin daemon and internal service communication."
+        " Falls back to FILES_URL if not specified.",
         default="",
     )
 
@@ -398,6 +405,11 @@ class InnerAPIConfig(BaseSettings):
         default=False,
     )
 
+    INNER_API_KEY: Optional[str] = Field(
+        description="API key for accessing the internal API",
+        default=None,
+    )
+
 
 class LoggingConfig(BaseSettings):
     """
@@ -525,6 +537,33 @@ class WorkflowNodeExecutionConfig(BaseSettings):
     )
 
 
+class RepositoryConfig(BaseSettings):
+    """
+    Configuration for repository implementations
+    """
+
+    CORE_WORKFLOW_EXECUTION_REPOSITORY: str = Field(
+        description="Repository implementation for WorkflowExecution. Specify as a module path",
+        default="core.repositories.sqlalchemy_workflow_execution_repository.SQLAlchemyWorkflowExecutionRepository",
+    )
+
+    CORE_WORKFLOW_NODE_EXECUTION_REPOSITORY: str = Field(
+        description="Repository implementation for WorkflowNodeExecution. Specify as a module path",
+        default="core.repositories.sqlalchemy_workflow_node_execution_repository.SQLAlchemyWorkflowNodeExecutionRepository",
+    )
+
+    API_WORKFLOW_NODE_EXECUTION_REPOSITORY: str = Field(
+        description="Service-layer repository implementation for WorkflowNodeExecutionModel operations. "
+        "Specify as a module path",
+        default="repositories.sqlalchemy_api_workflow_node_execution_repository.DifyAPISQLAlchemyWorkflowNodeExecutionRepository",
+    )
+
+    API_WORKFLOW_RUN_REPOSITORY: str = Field(
+        description="Service-layer repository implementation for WorkflowRun operations. Specify as a module path",
+        default="repositories.sqlalchemy_api_workflow_run_repository.DifyAPISQLAlchemyWorkflowRunRepository",
+    )
+
+
 class AuthConfig(BaseSettings):
     """
     Configuration for authentication and OAuth
@@ -604,7 +643,7 @@ class MailConfig(BaseSettings):
     """
 
     MAIL_TYPE: Optional[str] = Field(
-        description="Email service provider type ('smtp' or 'resend'), default to None.",
+        description="Email service provider type ('smtp' or 'resend' or 'sendGrid), default to None.",
         default=None,
     )
 
@@ -656,6 +695,11 @@ class MailConfig(BaseSettings):
     EMAIL_SEND_IP_LIMIT_PER_MINUTE: PositiveInt = Field(
         description="Maximum number of emails allowed to be sent from the same IP address in a minute",
         default=50,
+    )
+
+    SENDGRID_API_KEY: Optional[str] = Field(
+        description="API key for SendGrid service",
+        default=None,
     )
 
 
@@ -886,6 +930,7 @@ class FeatureConfig(
     MultiModalTransferConfig,
     PositionConfig,
     RagEtlConfig,
+    RepositoryConfig,
     SecurityConfig,
     ToolConfig,
     UpdateConfig,
